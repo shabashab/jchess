@@ -14,6 +14,8 @@ public class ChessBoardPlane extends Sprite {
 
   @Override
   public void draw(Batch batch, float parentAlpha) {
+    batch.end();
+
     _shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
     _shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
@@ -22,7 +24,7 @@ public class ChessBoardPlane extends Sprite {
         boolean isBlack = ((x + y) % 2) == 1;
 
         if(isBlack)
-          _shapeRenderer.setColor(Color.BLACK);
+          _shapeRenderer.setColor(Color.GREEN);
         else _shapeRenderer.setColor(Color.WHITE);
 
         _shapeRenderer.rect((float)x, (float)y, 1f, 1f);
@@ -30,5 +32,7 @@ public class ChessBoardPlane extends Sprite {
     }
 
     _shapeRenderer.end();
+
+    batch.begin();
   }
 }
