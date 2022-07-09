@@ -266,6 +266,9 @@ public class StockfishBoard implements ChessBoard {
     List<ChessPiecePosition> chessPiecePositions = new ArrayList<>();
 
     for (ChessCell chessCell : chessBoard) {
+      if(chessCell.chessPiece == null)
+        continue;
+
       chessPiecePositions.add(new ChessPiecePosition(chessCell.nameOfCell, chessCell.chessPiece));
     }
 

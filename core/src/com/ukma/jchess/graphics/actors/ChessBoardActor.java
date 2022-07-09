@@ -6,9 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.ukma.jchess.engine.ChessPiece;
-import com.ukma.jchess.engine.ChessPiecePosition;
-import com.ukma.jchess.engine.Move;
+import com.ukma.jchess.engine.*;
 import com.ukma.jchess.graphics.sprites.AvailableMoves;
 import com.ukma.jchess.graphics.sprites.ChessBoardPieces;
 import com.ukma.jchess.graphics.sprites.ChessBoardPlane;
@@ -27,26 +25,29 @@ public class ChessBoardActor extends Actor {
 
   private boolean _drawAvailableMoves;
   private String _availableMovesTarget;
+  private List<Move> _availableMovesForTarget;
   private List<Move> _availableMoves;
+
+  private ChessBoard _board;
+  private ChessEngine _engine;
 
   private final ChessPositionVector2Converter _converter;
 
-  public ChessBoardActor() {
+  public ChessBoardActor(ChessBoard board, ChessEngine engine) {
+    _board = board;
+    _engine = engine;
+
     _converter = new ChessPositionVector2Converter();
 
     _chessBoardPlane = new ChessBoardPlane();
     _chessBoardPieces = new ChessBoardPieces(_converter);
 
-    _positions = new ArrayList<>();
-    _positions.add(new ChessPiecePosition("a2", ChessPiece.PAWN_WHITE));
-    _positions.add(new ChessPiecePosition("b2", ChessPiece.PAWN_WHITE));
+    _positions = board.getPositions();
     _chessBoardPieces.update(_positions);
 
     _drawAvailableMoves = false;
 
-    _availableMoves = new ArrayList<>();
-    _availableMoves.add(new Move("a2", "a3"));
-    _availableMoves.add(new Move("b2", "b3"));
+    _availableMoves = engine.getAvailableMoves(board);
 
     _availableMovesSprite = new AvailableMoves(_converter);
     _availableMovesSprite.update(_availableMoves);
@@ -60,23 +61,38 @@ public class ChessBoardActor extends Actor {
     });
   }
 
+  private void makeMove(Move move) {
+    _board.makeMove(move);
+    _drawAvailableMoves = false;
+    _positions = _board.getPositions();
+    _chessBoardPieces.update(_positions);
+    _availableMoves = _engine.getAvailableMoves(_board);
+    _availableMovesSprite.update(_availableMoves);
+  }
+
   public void onChessBoardClick(float x, float y) {
     Vector2 position = new Vector2(x, y);
     String chessPosition = _converter.convertToChessPosition(position);
 
+    if(_drawAvailableMoves && _availableMovesForTarget.stream().anyMatch(move -> move.getTo().equals(chessPosition))) {
+      this.makeMove(new Move(_availableMovesTarget, chessPosition));
+      this.makeMove(_engine.getBestMove(_board));
+
+      return;
+    }
+
     if(_availableMovesTarget != null && _availableMovesTarget.equals(chessPosition) && _drawAvailableMoves) {
       _drawAvailableMoves = false;
-      _availableMovesTarget = null;
       return;
     }
 
     if(_positions.stream().noneMatch(chessPiecePosition -> chessPiecePosition.getPosition().equals(chessPosition))) {
       _drawAvailableMoves = false;
-      _availableMovesTarget = null;
       return;
     }
 
-    _availableMovesSprite.update(_availableMoves.stream().filter(move -> move.getFrom().equals(chessPosition)).collect(Collectors.toList()));
+    _availableMovesForTarget = _availableMoves.stream().filter(move -> move.getFrom().equals(chessPosition)).collect(Collectors.toList());
+    _availableMovesSprite.update(_availableMovesForTarget);
     _drawAvailableMoves = true;
     _availableMovesTarget = chessPosition;
   }
