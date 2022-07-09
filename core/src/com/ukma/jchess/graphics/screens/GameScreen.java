@@ -1,8 +1,10 @@
 package com.ukma.jchess.graphics.screens;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -17,12 +19,15 @@ public class GameScreen implements Screen {
     _camera = new OrthographicCamera(8, 8);
     _viewport = new FitViewport(8, 8, _camera);
     _stage = new Stage(_viewport);
-    _stage.addActor(new ChessBoardActor());
+
+    Actor chessBoardActor = new ChessBoardActor();
+    chessBoardActor.setBounds(0, 0, 8f, 8f);
+    _stage.addActor(chessBoardActor);
   }
 
   @Override
   public void show() {
-
+    Gdx.input.setInputProcessor(_stage);
   }
 
   @Override

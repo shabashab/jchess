@@ -24,7 +24,7 @@ public class ChessBoardPlane extends Sprite {
         boolean isBlack = ((x + y) % 2) == 1;
 
         if(isBlack)
-          _shapeRenderer.setColor(Color.GREEN);
+          _shapeRenderer.setColor(Color.DARK_GRAY);
         else _shapeRenderer.setColor(Color.WHITE);
 
         _shapeRenderer.rect((float)x, (float)y, 1f, 1f);

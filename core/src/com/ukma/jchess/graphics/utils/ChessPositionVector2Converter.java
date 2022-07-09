@@ -23,6 +23,6 @@ public class ChessPositionVector2Converter {
     result[0] = (char)(((int)position.x) + 97);
     result[1] = (char)(((int)position.y) + 49);
 
-    return Arrays.toString(result);
+    return new String(result);
   }
 }
