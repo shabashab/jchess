@@ -7,4 +7,6 @@ public interface ChessEngine {
 
   List<Move> getAvailableMoves(ChessBoard board);
   Move getBestMove(ChessBoard board);
+
+  void setSkillLevel(int level);
 }
