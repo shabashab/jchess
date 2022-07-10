@@ -11,46 +11,32 @@ import com.ukma.jchess.graphics.sprites.AvailableMoves;
 import com.ukma.jchess.graphics.sprites.ChessBoardPieces;
 import com.ukma.jchess.graphics.sprites.ChessBoardPlane;
 import com.ukma.jchess.graphics.utils.ChessPositionVector2Converter;
+import com.ukma.jchess.graphics.utils.ChessSidePositionConverter;
+import com.ukma.jchess.graphics.utils.MoveController;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ChessBoardActor extends Actor {
   private final Sprite _chessBoardPlane;
   private final ChessBoardPieces _chessBoardPieces;
   private final AvailableMoves _availableMovesSprite;
 
-  private List<ChessPiecePosition> _positions;
-
   private boolean _drawAvailableMoves;
   private String _availableMovesTarget;
   private List<Move> _availableMovesForTarget;
-  private List<Move> _availableMoves;
 
-  private ChessBoard _board;
-  private ChessEngine _engine;
+  private final MoveController _controller;
 
-  private final ChessPositionVector2Converter _converter;
+  private boolean _canPlayerMakeMove;
 
-  public ChessBoardActor(ChessBoard board, ChessEngine engine) {
-    _board = board;
-    _engine = engine;
+  public ChessBoardActor(MoveController controller) {
+    _controller = controller;
 
-    _converter = new ChessPositionVector2Converter();
-
-    _chessBoardPlane = new ChessBoardPlane();
-    _chessBoardPieces = new ChessBoardPieces(_converter);
-
-    _positions = board.getPositions();
-    _chessBoardPieces.update(_positions);
+    _chessBoardPlane = new ChessBoardPlane(_controller);
+    _chessBoardPieces = new ChessBoardPieces(_controller);
+    _availableMovesSprite = new AvailableMoves(_controller);
 
     _drawAvailableMoves = false;
-
-    _availableMoves = engine.getAvailableMoves(board);
-
-    _availableMovesSprite = new AvailableMoves(_converter);
-    _availableMovesSprite.update(_availableMoves);
 
     this.addListener(new InputListener() {
       @Override
@@ -61,23 +47,16 @@ public class ChessBoardActor extends Actor {
     });
   }
 
-  private void makeMove(Move move) {
-    _board.makeMove(move);
-    _drawAvailableMoves = false;
-    _positions = _board.getPositions();
-    _chessBoardPieces.update(_positions);
-    _availableMoves = _engine.getAvailableMoves(_board);
-    _availableMovesSprite.update(_availableMoves);
-  }
-
   public void onChessBoardClick(float x, float y) {
+    if(_controller.getIsBoardLocked())
+      return;
+
     Vector2 position = new Vector2(x, y);
-    String chessPosition = _converter.convertToChessPosition(position);
+    String chessPosition = ChessPositionVector2Converter.convertToChessPosition(ChessSidePositionConverter.screenCoordinatesToChess(position, _controller.getRenderSide()));
 
     if(_drawAvailableMoves && _availableMovesForTarget.stream().anyMatch(move -> move.getTo().equals(chessPosition))) {
-      this.makeMove(new Move(_availableMovesTarget, chessPosition));
-      this.makeMove(_engine.getBestMove(_board));
-
+      _controller.makeMove(new Move(_availableMovesTarget, chessPosition));
+      _drawAvailableMoves = false;
       return;
     }
 
@@ -86,12 +65,7 @@ public class ChessBoardActor extends Actor {
       return;
     }
 
-    if(_positions.stream().noneMatch(chessPiecePosition -> chessPiecePosition.getPosition().equals(chessPosition))) {
-      _drawAvailableMoves = false;
-      return;
-    }
-
-    _availableMovesForTarget = _availableMoves.stream().filter(move -> move.getFrom().equals(chessPosition)).collect(Collectors.toList());
+    _availableMovesForTarget = _controller.getAvailableMovesForPosition(chessPosition);
     _availableMovesSprite.update(_availableMovesForTarget);
     _drawAvailableMoves = true;
     _availableMovesTarget = chessPosition;

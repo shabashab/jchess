@@ -7,16 +7,19 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.ukma.jchess.engine.Move;
 import com.ukma.jchess.graphics.utils.ChessPositionVector2Converter;
+import com.ukma.jchess.graphics.utils.ChessSidePositionConverter;
+import com.ukma.jchess.graphics.utils.MoveController;
 
 import java.util.List;
 
 public class AvailableMoves extends Sprite {
   private List<Move> _availableMovesTo;
-  private ShapeRenderer _shapeRenderer;
-  private final ChessPositionVector2Converter _converter;
+  private final ShapeRenderer _shapeRenderer;
 
-  public AvailableMoves(ChessPositionVector2Converter converter) {
-    _converter = converter;
+  private final MoveController _controller;
+
+  public AvailableMoves(MoveController controller) {
+    _controller = controller;
     _shapeRenderer = new ShapeRenderer();
   }
 
@@ -36,7 +39,7 @@ public class AvailableMoves extends Sprite {
 
     _shapeRenderer.setColor(new Color(0f, 0.3f, 0f, 0.1f));
     for(Move move: _availableMovesTo) {
-      Vector2 pos = _converter.convertToVector2(move.getTo());
+      Vector2 pos = ChessSidePositionConverter.chessToScreenCoordinates(ChessPositionVector2Converter.convertToVector2(move.getTo()), _controller.getRenderSide());
       _shapeRenderer.circle(pos.x + 0.5f, pos.y + 0.5f, 0.2f, 50);
     }
 

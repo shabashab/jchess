@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.Arrays;
 
 public class ChessPositionVector2Converter {
-  public Vector2 convertToVector2(String chessPosition) {
+  public static Vector2 convertToVector2(String chessPosition) {
     if(chessPosition.length() != 2)
       throw new IllegalArgumentException("Chess position must be length of 2");
 
@@ -17,7 +17,7 @@ public class ChessPositionVector2Converter {
     return new Vector2(x, y);
   }
 
-  public String convertToChessPosition(Vector2 position) {
+  public static String convertToChessPosition(Vector2 position) {
     char[] result = new char[2];
 
     result[0] = (char)(((int)position.x) + 97);

@@ -21,11 +21,10 @@ public class StockFishEngine implements ChessEngine {
 
     String[] rows = input.split("\n");
 
+    List<Move> outputList = new ArrayList<>();
 
-    List<Move> outputList = new ArrayList();
-
-    for(int i = 1; i < rows.length; i++) {
-      String row = rows[i].split(": ")[0];
+    for (String fullRow : rows) {
+      String row = fullRow.split(": ")[0];
 
       if (row.length() != 4) {
         continue;

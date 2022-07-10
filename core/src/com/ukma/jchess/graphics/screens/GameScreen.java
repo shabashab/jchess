@@ -9,8 +9,11 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.ukma.jchess.engine.ChessBoard;
+import com.ukma.jchess.engine.ChessSide;
 import com.ukma.jchess.engine.stockfish.StockFishEngine;
 import com.ukma.jchess.graphics.actors.ChessBoardActor;
+import com.ukma.jchess.graphics.utils.GameMode;
+import com.ukma.jchess.graphics.utils.MoveController;
 
 public class GameScreen implements Screen {
   private final Viewport _viewport;
@@ -22,10 +25,7 @@ public class GameScreen implements Screen {
     _viewport = new FitViewport(8, 8, _camera);
     _stage = new Stage(_viewport);
 
-    StockFishEngine engine = new StockFishEngine();
-    ChessBoard board = engine.createBoard();
-
-    Actor chessBoardActor = new ChessBoardActor(board, engine);
+    Actor chessBoardActor = new ChessBoardActor(new MoveController(GameMode.PLAYER_PLAYER, ChessSide.BLACK, new StockFishEngine()));
     chessBoardActor.setBounds(0, 0, 8f, 8f);
     _stage.addActor(chessBoardActor);
   }

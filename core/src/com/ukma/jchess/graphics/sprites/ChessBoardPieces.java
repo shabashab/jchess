@@ -6,22 +6,34 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.ukma.jchess.engine.ChessPiecePosition;
 import com.ukma.jchess.graphics.utils.ChessPositionVector2Converter;
+import com.ukma.jchess.graphics.utils.ChessSidePositionConverter;
+import com.ukma.jchess.graphics.utils.MoveController;
 import com.ukma.jchess.graphics.utils.PieceTextureManager;
 
 import java.util.List;
 
 public class ChessBoardPieces extends Sprite {
+  private MoveController _controller;
+
   private List<ChessPiecePosition> _positions;
-  private final ChessPositionVector2Converter _converter;
   private final PieceTextureManager _pieceTextureManager;
 
-  public ChessBoardPieces(ChessPositionVector2Converter converter) {
-    _converter = converter;
+
+  public ChessBoardPieces(MoveController controller) {
+    _controller = controller;
+
+    controller.subscribeOnChessBoardUpdate(this::onChessBoardUpdate);
+    onChessBoardUpdate();
+
     _pieceTextureManager = new PieceTextureManager();
     _pieceTextureManager.loadTextures(Gdx.files.internal("assets/ChessPieces.png"));
   }
 
-  public void update(List<ChessPiecePosition> positions) {
+  private void onChessBoardUpdate() {
+    update(_controller.getBoard().getPositions());
+  }
+
+  private void update(List<ChessPiecePosition> positions) {
     _positions = positions;
   }
 
@@ -31,7 +43,8 @@ public class ChessBoardPieces extends Sprite {
       return;
 
     for (ChessPiecePosition position : _positions) {
-      Vector2 positionCoordinates = _converter.convertToVector2(position.getPosition());
+      Vector2 positionCoordinates = ChessSidePositionConverter.chessToScreenCoordinates(ChessPositionVector2Converter.convertToVector2(position.getPosition()), _controller.getRenderSide());
+
       batch.draw(
         _pieceTextureManager.getTextureRegionByPiece(position.getPiece()),
         positionCoordinates.x,

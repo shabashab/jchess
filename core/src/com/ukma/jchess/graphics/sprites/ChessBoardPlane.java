@@ -4,11 +4,15 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.ukma.jchess.engine.ChessSide;
+import com.ukma.jchess.graphics.utils.MoveController;
 
 public class ChessBoardPlane extends Sprite {
   private final ShapeRenderer _shapeRenderer;
+  private final MoveController _controller;
 
-  public ChessBoardPlane() {
+  public ChessBoardPlane(MoveController controller) {
+    _controller = controller;
     _shapeRenderer = new ShapeRenderer();
   }
 
@@ -22,6 +26,9 @@ public class ChessBoardPlane extends Sprite {
     for(int x = 0; x < 8; x++) {
       for(int y = 0; y < 8; y++) {
         boolean isBlack = ((x + y) % 2) == 1;
+
+        if(_controller.getRenderSide() == ChessSide.BLACK)
+          isBlack = !isBlack;
 
         if(isBlack)
           _shapeRenderer.setColor(Color.DARK_GRAY);
