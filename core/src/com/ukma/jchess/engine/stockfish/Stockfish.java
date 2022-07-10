@@ -40,6 +40,36 @@ public class Stockfish {
     }
   }
 
+  public String getOutputUntilContains(String endString, int sleepTime) {
+    StringBuilder builder = new StringBuilder();
+
+    main_loop:
+    while (true) {
+      try {
+        Thread.sleep(50);
+        sendCommand("isready");
+
+        while (true) {
+          String text = processReader.readLine();
+
+          if (text.contains(endString)) {
+            builder.append(text).append("\n");
+            break main_loop;
+          }
+
+          if (text.equals("readyok"))
+            break;
+          else
+            builder.append(text).append("\n");
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+
+    return builder.toString();
+  }
+
   public String getOutput(int waitTime) {
     StringBuffer buffer = new StringBuffer();
     try {
@@ -59,13 +89,11 @@ public class Stockfish {
   }
 
   public String getBestMove(String fen, int waitTime) {
-      sendCommand("position fen " + fen);
-      sendCommand("go movetime " + waitTime);
-      String output = getOutput(waitTime + 20);
+    sendCommand("position fen " + fen);
+    sendCommand("go movetime " + waitTime);
+    String output = getOutputUntilContains("bestmove", 150);
 
-      if (output.split("bestmove ").length > 1)
-      return output.split("bestmove ")[1].split(" ")[0];
-    return null;
+    return output.split("bestmove ")[1].split(" ")[0];
   }
 
 
@@ -81,8 +109,7 @@ public class Stockfish {
   public String getLegalMoves(String fen) {
     sendCommand("position fen " + fen);
     sendCommand("go perft 1");
-    String output = getOutput(3000);
-    return output;
+    return getOutputUntilContains("Nodes searched", 100);
   }
 
   public void drawBoard(String fen) {
