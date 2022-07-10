@@ -18,10 +18,13 @@ import com.ukma.jchess.graphics.utils.GameMode;
 import com.ukma.jchess.graphics.utils.MoveController;
 import com.ukma.jchess.graphics.utils.StartGameListener;
 
+import java.util.Random;
+
 public class MenuScreen implements Screen {
   private final Stage _uiStage;
   private final Table _uiTable;
   private final SelectBox<String> _difficultySelectBox;
+  private final SelectBox<String> _sideSelectBox;
 
   private StartGameListener _startGameListener;
 
@@ -40,7 +43,21 @@ public class MenuScreen implements Screen {
       public void clicked(InputEvent event, float x, float y) {
         ChessEngine engine = new StockFishEngine();
         engine.setSkillLevel(_difficultySelectBox.getSelectedIndex() * 4);
-        MoveController controller = new MoveController(GameMode.PLAYER_AI, ChessSide.WHITE, engine);
+
+        ChessSide startSide = ChessSide.WHITE;
+
+        int selectedSide = _sideSelectBox.getSelectedIndex();
+
+        if(selectedSide != 0 && selectedSide != 1) {
+          Random random = new Random();
+          selectedSide = random.nextInt(0, 2);
+        }
+
+        if (selectedSide == 1) {
+          startSide = ChessSide.BLACK;
+        }
+
+        MoveController controller = new MoveController(GameMode.PLAYER_AI, startSide, engine);
         if(_startGameListener != null)
           _startGameListener.startGame(controller);
       }
@@ -48,7 +65,6 @@ public class MenuScreen implements Screen {
     _uiTable.add(aiButton);
 
     _uiTable.row().pad(20);
-
 
     Label difficultyText = new Label("AI difficulty: ", skin);
 
@@ -58,6 +74,17 @@ public class MenuScreen implements Screen {
     _difficultySelectBox = new SelectBox<>(skin);
     _difficultySelectBox.setItems("Super easy", "Easy", "Medium", "Hard", "SUPER EXTREMELY HARD");
     _uiTable.add(_difficultySelectBox);
+
+    _uiTable.row().pad(20);
+
+    Label sideSelectionLabel = new Label("Side:", skin);
+
+    _uiTable.add(sideSelectionLabel);
+    _uiTable.row();
+
+    _sideSelectBox = new SelectBox<>(skin);
+    _sideSelectBox.setItems("White", "Black", "Random");
+    _uiTable.add(_sideSelectBox);
 
     _uiTable.row().pad(20);
 
@@ -74,7 +101,6 @@ public class MenuScreen implements Screen {
       }
     });
 
-    _uiTable.row().pad(20);
 
     _uiStage.addActor(_uiTable);
   }

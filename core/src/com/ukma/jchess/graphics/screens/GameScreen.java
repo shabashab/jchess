@@ -8,10 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.ukma.jchess.engine.ChessSide;
-import com.ukma.jchess.engine.stockfish.StockFishEngine;
 import com.ukma.jchess.graphics.actors.ChessBoardActor;
-import com.ukma.jchess.graphics.utils.GameMode;
 import com.ukma.jchess.graphics.utils.MoveController;
 
 public class GameScreen implements Screen {
